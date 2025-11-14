@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-// FIX: Correctly import GoogleGenAI and Chat from '@google/genai'.
 import { GoogleGenAI, Chat } from '@google/genai';
 import { ChatIcon } from './icons/ChatIcon';
 import { CloseIcon } from './icons/CloseIcon';
@@ -23,13 +22,15 @@ const Chatbot: React.FC = () => {
       const initializeChat = async () => {
         setIsLoading(true);
         
-        // FIX: API key must be obtained from process.env.API_KEY.
-        const apiKey = process.env.API_KEY;
+        // In a Vite project, environment variables must be prefixed with VITE_
+        // and accessed via import.meta.env to be exposed to the client.
+        // The user needs to set VITE_API_KEY in their Vercel environment.
+        const apiKey = import.meta.env.VITE_API_KEY;
 
         if (!apiKey) {
-          // FIX: Updated error message for API key.
-          console.error("Gemini API key not found. Make sure API_KEY is set in your environment variables.");
-          setMessages([{ sender: 'ai', text: "Izvinite, AI asistent nije pravilno konfigurisan. Nedostaje API ključ." }]);
+          const errorMessage = "Greška u konfiguraciji AI asistenta. Potrebno je da postavite `VITE_API_KEY` u podešavanjima okruženja (Environment Variables) na Vercelu i ponovo pokrenete 'deploy'.";
+          console.error("VITE_API_KEY environment variable not found. Please ensure it is set in your Vercel project settings and that you have redeployed the application. The variable must be prefixed with 'VITE_'.");
+          setMessages([{ sender: 'ai', text: errorMessage }]);
           setIsError(true);
           setIsLoading(false);
           return;
