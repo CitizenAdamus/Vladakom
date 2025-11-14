@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { Chat } from '@google/genai';
+// FIX: Correctly import GoogleGenAI and Chat from '@google/genai'.
+import { GoogleGenAI, Chat } from '@google/genai';
 import { ChatIcon } from './icons/ChatIcon';
 import { CloseIcon } from './icons/CloseIcon';
 
@@ -21,16 +22,13 @@ const Chatbot: React.FC = () => {
     if (isOpen && !chatRef.current && !isError) {
       const initializeChat = async () => {
         setIsLoading(true);
-        let apiKey: string | undefined;
-        try {
-          // This ensures 'process' is not referenced in environments where it doesn't exist.
-          apiKey = process.env.API_KEY;
-        } catch (e) {
-          apiKey = undefined;
-        }
+        
+        // FIX: API key must be obtained from process.env.API_KEY.
+        const apiKey = process.env.API_KEY;
 
         if (!apiKey) {
-          console.error("Gemini API key is not configured.");
+          // FIX: Updated error message for API key.
+          console.error("Gemini API key not found. Make sure API_KEY is set in your environment variables.");
           setMessages([{ sender: 'ai', text: "Izvinite, AI asistent nije pravilno konfigurisan. Nedostaje API ključ." }]);
           setIsError(true);
           setIsLoading(false);
@@ -38,7 +36,6 @@ const Chatbot: React.FC = () => {
         }
 
         try {
-          const { GoogleGenAI } = await import('@google/genai');
           const ai = new GoogleGenAI({ apiKey });
           chatRef.current = ai.chats.create({
             model: 'gemini-2.5-flash',
